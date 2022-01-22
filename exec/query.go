@@ -146,8 +146,12 @@ func printResultsHorizontally(results [][]*cloudwatchlogs.ResultField, showptr b
 			fieldLen--
 		}
 
-		for _, result := range results {
-			fmt.Fprint(out, "{")
+		resultLen := len(results)
+
+		fmt.Fprintln(out, "[")
+		for r, result := range results {
+
+			fmt.Fprint(out, "{ ")
 
 			for i, field := range result {
 				if !showptr && *field.Field == "@ptr" {
@@ -158,13 +162,18 @@ func printResultsHorizontally(results [][]*cloudwatchlogs.ResultField, showptr b
 				value := escapeJson(*field.Value)
 				fmt.Fprintf(out, `%s:%s`, name, value)
 
-				if i < fieldLen-1 {
-					fmt.Fprint(out, ",")
+				if i < fieldLen {
+					fmt.Fprint(out, ", ")
 				}
 			}
 
-			fmt.Fprintln(out, "}")
+			if r < resultLen-1 {
+				fmt.Fprintln(out, " }, ")
+			} else {
+				fmt.Fprintln(out, " }")
+			}
 		}
+		fmt.Fprintln(out, "]")
 	}
 }
 
